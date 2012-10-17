@@ -59,7 +59,7 @@ void *Stack_pop(T stk)
 void Stack_free(T *stk)
 {
 	struct elem *t, *u;
-	assert(stk->identifer == STACK_INDENTIFER);
+	assert((*stk)->identifer == STACK_INDENTIFER);
 	assert(stk && *stk);
 	for (t = (*stk)->head; t; t = u) {
 		u = t->link;
