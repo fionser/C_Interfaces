@@ -3,6 +3,12 @@
 #include "stack.h"
 #include "mem.h"
 #define T Stack_T
+/* 
+ * To give some kind of check, Users should use
+ * Stack_new() to get the stack object. 
+ * But not that useful.
+ * */
+static int STACK_INDENTIFER = 0x09051175;
 struct T {
 	int count;
 	struct elem {
