@@ -29,6 +29,7 @@ int main(int argc, char *argv[])
 	}
 	if (argc == 1)
 		wf(NULL, stdin);
+	Atom_reset();
 	return EXIT_SUCCESS;
 }
 
@@ -55,8 +56,9 @@ void wf(const char *name, FILE *fp)
 			buf[i] = tolower(buf[i]);
 		word = Atom_string(buf);
 		count = Table_get(table, word);
-		if (count != NULL)
+		if (count != NULL) {
 			(*count)++;
+		}
 		else {
 			NEW(count);
 			(*count) = 1;
@@ -68,6 +70,9 @@ void wf(const char *name, FILE *fp)
 	{
 		int i;
 		void **array = Table_toArray(table, NULL);
+			/* 
+			 * Print the array alphatically.
+			 * */
 		qsort(array, Table_length(table), 2 * sizeof(*array),
 				compare);
 		for (i = 0; array[i]; i += 2) {
@@ -76,14 +81,27 @@ void wf(const char *name, FILE *fp)
 		}
 		FREE(array);
 	}
+		/* Each element in table should apply the
+		 * function vfree.
+		 * */
 	Table_map(table, vfree, NULL);
 	Table_free(&table);
-	Atom_reset();
 }
 
 int compare(const void *x, const void *y)
 {
-	return strcmp(*(char **)x, *(char **)y);
+		/* x and y actually point  to two element
+		 * the first is a key(string) and the second is
+		 * a value(int).
+		 * */
+	int cx = **((int **)x + 1);
+	int cy = **((int **)y + 1);
+	if (cx < cy)
+		return 1;
+	if (cx == cy)
+		return strcmp(*(char **)x, *(char **)y);
+	if (cx > cy)
+		return -1;
 }
 
 void vfree(const void *key, void **count, void *cl)
