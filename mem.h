@@ -3,10 +3,11 @@
 #include "except.h"
 extern void *Mem_alloc(long nbytes,
 		const char *file, int line);
-extern void *Mem_calloc(long count, long nbytes,
-		const char *file, int line);
 #define ALLOC(nbytes) \
 	Mem_alloc((nbytes), __FILE__, __LINE__)
+
+extern void *Mem_calloc(long count, long nbytes,
+		const char *file, int line);
 #define CALLOC(count, nbytes) \
 	Mem_calloc(count, nbytes, __FILE__, __LINE__)
 /* 
