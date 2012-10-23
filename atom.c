@@ -106,8 +106,9 @@ const char *Atom_new(const char *str, int len)
 			for (i = 0; i < len && p->str[i] == str[i]; ) {
 				i++;
 			}
-			if (i == len)
+			if (i == len) {
 				return p->str;
+			}
 		}
 	}
 	//the extra 1 for the terminate symbol.
