@@ -3,6 +3,7 @@
 #include "except.h"
 extern void *Mem_alloc(long nbytes,
 		const char *file, int line);
+extern const Except_T Mem_Failed;
 #define ALLOC(nbytes) \
 	Mem_alloc((nbytes), __FILE__, __LINE__)
 
