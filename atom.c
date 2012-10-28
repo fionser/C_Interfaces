@@ -159,6 +159,8 @@ void Atom_free(const char *str)
 			return ;
 		}
 	}
+    //Impossible to hanppen
+    assert(0);
 }
 
 void Atom_reset()
