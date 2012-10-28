@@ -123,6 +123,34 @@ const char *Atom_new(const char *str, int len)
 	return p->str;
 }
 
+const char *Atom_add(const char *str, int len)
+{
+    unsigned long h;
+    struct atom *p;
+    int i;
+
+    assert(str);
+    assert(len >= 0);
+    h = Atom_hash(str, len);
+    h = h % NELEMS(buckets);
+    for (p = buckets[h]; p; p = p->link) {
+        if (len == p->len) {
+            for (i = 0; i < len && p->str[i] == str[i]; ) {
+                i++;
+            }
+            if (i == len) {
+                return p->str;
+            }
+        }
+    }
+    p = ALLOC(sizeof *p);
+    p->len = len;
+    p->str = (char *)str;
+    p->link = buckets[h];
+    buckets[h] = p;
+    return p->str;
+}
+
 int Atom_length(const char *str)
 {
 	struct atom *p;
