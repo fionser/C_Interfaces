@@ -17,24 +17,27 @@ void print(Table_T);
 int first(int c);
 int rest(int c);
 int linenum;
+/* These three functions to
+ * free all the memory allocated.
+ * */
 void freeIdent(const void *key, void **value, void *cl);
 void freeIndex(const void *key, void **value, void *cl);
 void freeSet(const void *member, void *cl);
-
+/* Free identifier table */
 void freeIdent(const void *key, void **value, void *cl)
 {
     Table_T table = (Table_T)(*value); 
     Table_map(table, freeIndex, NULL);
     Table_free(&table);
 }
-
+/* Free index table */
 void freeIndex(const void *key, void **value, void *cl)
 {
     Set_T set = (Set_T)(*value);
     Set_map(set, freeSet, NULL);
     Set_free(&set);
 }
-
+/* Free line number set */
 void freeSet(const void *member, void *cl)
 {
     void *mem = (void *)member;
@@ -85,8 +88,9 @@ int compare(const void *x, const void *y)
 void print(Table_T files)
 {
     int i;
+    /* key:word ,value:the set of line number */
     void **array = Table_toArray(files, NULL);
-
+    /* sort the words alphabetically */
     qsort(array, Table_length(files),
             2 * sizeof(*array), compare);
 
@@ -96,8 +100,12 @@ void print(Table_T files)
         {
             int j;
             void **lines = Set_toArray(array[i + 1], NULL);
+            /* lines is the set of the line number 
+             * Sort the line number incrementally.
+             * */
             qsort(lines, Set_length(array[i + 1]),
                     sizeof(*lines), cmpint);
+            /* print all line number refers to this word (array[i]) */
             for (j = 0; lines[j]; j++)
                 printf(" %d", *(int *)lines[j]);
             FREE(lines);
@@ -105,7 +113,7 @@ void print(Table_T files)
         printf("\n");
     }
 }
-
+/* Used to sort the array return by Set_toArray */
 int cmpint(const void *x, const void *y)
 {
     if (**(int **)x < **(int **)y)
@@ -115,7 +123,7 @@ int cmpint(const void *x, const void *y)
     else
         return 0;
 }
-
+/* Used by Set */
 int intcmp(const void *x, const void *y)
 {
     return cmpint(&x, &y);
@@ -125,7 +133,11 @@ unsigned inthash(const void *x)
 {
     return *(int *)x;
 }
-
+/* 
+ * identifiers --> files --> countSet
+ * Each identifier maps to a table of file names,
+ * the table of file names then maps to a set of count.
+ * */
 void xref(const char *name, FILE *fp,
         Table_T identifiers)
 {
@@ -135,6 +147,7 @@ void xref(const char *name, FILE *fp,
         name = "";
     name = Atom_string(name);
     linenum = 1;
+    /* Get each word in file */
     while (getword(fp, buf, sizeof(buf), first, rest)) {
         Set_T set;
         Table_T files;
