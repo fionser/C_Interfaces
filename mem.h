@@ -1,6 +1,7 @@
 #ifndef MEM_INCLUDED
 #define MEM_INCLUDED
 #include "except.h"
+#include <stdio.h>
 extern void *Mem_alloc(long nbytes,
 		const char *file, int line);
 #define ALLOC(nbytes) \
@@ -28,5 +29,6 @@ extern void *Mem_resize(void *ptr, long nbytes,
 		const char *file, int line);
 #define RESIZE(ptr, nbytes) ((ptr) = Mem_resize((ptr), \
 			(nbytes), __FILE__, __LINE__))
+extern void printAF(FILE *);
 #endif
 
