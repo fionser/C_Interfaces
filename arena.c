@@ -101,7 +101,6 @@ void *Arena_alloc(T arena, long nbytes,
 		else
 			m += nbytes;
 		ptr = malloc(m);
-        printf("allocate %p %p\n", ptr, ptr + m);
 		if (ptr == NULL) {
 			if (file == NULL)
 				RAISE(Arena_Failed);
