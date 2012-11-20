@@ -1,11 +1,12 @@
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 #include "assert.h"
 #include "except.h"
 #include "arena.h"
 #define T Arena_T
 #define MAX_ALLOC_ONCE_TIME (10 * 1024)
-#define THRESHOLD 10
+#define THRESHOLD (5)
 
 const Except_T Arena_NewFailed =
 	{ "Arena Creation Failed" };
@@ -100,6 +101,7 @@ void *Arena_alloc(T arena, long nbytes,
 		else
 			m += nbytes;
 		ptr = malloc(m);
+        printf("allocate %p %p\n", ptr, ptr + m);
 		if (ptr == NULL) {
 			if (file == NULL)
 				RAISE(Arena_Failed);
@@ -115,10 +117,10 @@ void *Arena_alloc(T arena, long nbytes,
 		arena->limit = limit;
 		arena->prev  = ptr;
 		arena->avail += nbytes;
-		return arena->avail - nbytes;
+		return (arena->avail - nbytes);
 	} else {//From the previous block 
-		ptr->avail -= nbytes;
-		return ptr->avail - nbytes;
+		ptr->avail += nbytes;
+		return (ptr->avail - nbytes);
 	}
 }
 
@@ -154,5 +156,16 @@ void Arena_free(T arena)
 	}
 	assert(arena->limit == NULL);
 	assert(arena->avail == NULL);
+}
+
+void Arena_exit(T *arena)
+{
+    T p, q;
+    Arena_free(*arena);
+    for (p = freechunks; p; p = q) {
+        q = p->prev;
+        free(p);
+    }
+    Arena_dispose(arena);
 }
 

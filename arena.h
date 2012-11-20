@@ -15,4 +15,9 @@ extern void *Arena_alloc(T arena, long nbytes,
 extern void *Arena_calloc(T arena, long count,
 		long nbytes, const char *file, int line);
 extern void  Arena_free(T arena);
+extern void Arena_exit(T *arena);
+
+#define AR_ALLOC(arena, nbytes) \
+        Arena_alloc(arena, (nbytes), __FILE__, __LINE__)
+#undef T
 #endif
