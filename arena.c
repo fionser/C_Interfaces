@@ -6,7 +6,7 @@
 #include "arena.h"
 #define T Arena_T
 #define MAX_ALLOC_ONCE_TIME (10 * 1024)
-#define THRESHOLD (5)
+#define THRESHOLD (10)
 
 const Except_T Arena_NewFailed =
 	{ "Arena Creation Failed" };
@@ -15,6 +15,7 @@ const Except_T Arena_Failed =
 
 struct T {
 	T prev;
+    unsigned int threshold;
 	char *avail;
 	char *limit;
 };
@@ -27,6 +28,7 @@ union align {
 	double d;
 	long double ld;
 };
+
 union header {
 	struct T b;
 	union align ba;
@@ -34,11 +36,15 @@ union header {
 static T freechunks;
 static int nfree;
 
-T Arena_new(void)
+T Arena_new(int threshold)
 {
-	T arena = malloc(sizeof (*arena));
+    T arena;
+    assert(threshold >= 0);
+	arena = malloc(sizeof (*arena));
 	if (arena == NULL)
 		RAISE(Arena_NewFailed);
+    arena->threshold = (THRESHOLD > threshold) ?
+        THRESHOLD : threshold;
 	arena->prev = NULL;
 	arena->avail = arena->limit = NULL;
 	return arena;
@@ -47,7 +53,6 @@ T Arena_new(void)
 void Arena_dispose(T *ap)
 {
 	assert(ap && *ap);
-	Arena_free(*ap);
 	free(*ap);
 	*ap = NULL;
 }
@@ -142,11 +147,12 @@ void Arena_free(T arena)
 		 * tmp->avail = arena->prev->avail;
 		 * tmp->limit = arena->prev->limit;
 		 * */
-		struct T tmp = *arena->prev;
-		if (nfree < THRESHOLD) {
+		struct T tmp = *(arena->prev);
+		if (nfree < arena->threshold) {
 			arena->prev->prev = freechunks;
 			freechunks = arena->prev;
 			nfree++;
+            freechunks->avail = (char *)((union header *)freechunks + 1);
 			freechunks->limit = arena->limit;
 		} else {
 			free(arena->prev);
@@ -160,11 +166,12 @@ void Arena_free(T arena)
 void Arena_exit(T *arena)
 {
     T p, q;
+    assert(arena && *arena);
     Arena_free(*arena);
     for (p = freechunks; p; p = q) {
         q = p->prev;
         free(p);
     }
-    Arena_dispose(arena);
+    free(*arena);
 }
 

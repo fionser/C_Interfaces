@@ -8,7 +8,7 @@ typedef struct T *T;
 extern const Except_T Arena_NewFailed;
 extern const Except_T Arena_Failed;
 
-extern T     Arena_new(void);
+extern T     Arena_new(int threshold);
 extern void  Arena_dispose(T *ap);
 extern void *Arena_alloc(T arena, long nbytes,
 		const char *file, int line);
