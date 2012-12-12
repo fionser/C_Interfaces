@@ -3,16 +3,18 @@
 #define T Table_T
 typedef struct T *T;
 extern T     Table_new(int hint,
-		               int cmp(const void *, const void *),
-		               unsigned hash(const void *key));
+        int cmp(const void *, const void *),
+        unsigned hash(const void *key));
 extern void  Table_free(T *table);
 extern int   Table_length(T table);
+extern int   Table_loading(T table);
+extern void  Table_extend(T *table);
 extern void *Table_put(T table, const void *key, void *vaule);
 extern void *Table_get(T table, const void *key);
 extern void *Table_remove(T table, const void *key);
 extern void  Table_map(T table,
-		               void apply(const void *key, void **value, void *cl),
-					   void *cl);
+        void apply(const void *key, void **value, void *cl),
+        void *cl);
 extern void  **Table_toArray(T table, void *end);
 #undef T
 #endif

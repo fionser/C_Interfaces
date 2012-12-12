@@ -5,6 +5,8 @@
 #include "except.h"
 #include "mem.h"
 const Except_T Mem_Failed = { "Allocation Failed" };
+int alt = 0;
+int frt = 0;
 void *Mem_alloc(long nbytes, const char *file, int line)
 {
 	void *ptr;
@@ -24,6 +26,7 @@ void *Mem_alloc(long nbytes, const char *file, int line)
 			Except_raise(&Mem_Failed, file, line);
 		}
 	}
+    alt++;
 	return ptr;
 }
 
@@ -40,6 +43,7 @@ void *Mem_calloc(long count, long nbytes,
 		else
 			Except_raise(&Mem_Failed, file, line);
 	}
+    alt++;
 	return ptr;
 }
 
@@ -62,4 +66,10 @@ void Mem_free(void *ptr, const char *file, int line)
 {
 	if (ptr)
 		free(ptr);
+    frt++;
+}
+
+void printAF(FILE *fp)
+{
+    fprintf(fp, "allocate %d free %d\n", alt, frt);
 }
